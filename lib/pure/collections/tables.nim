@@ -7,58 +7,57 @@
 #    distribution, for details about the copyright.
 #
 
-## The ``tables`` module implements variants of an efficient `hash table`:idx:
-## (also often named `dictionary`:idx: in other programming languages) that is
-## a mapping from keys to values.
+##  ``tables`` 模块包含了很多关于 `hash table`:idx: (哈希表)
+## (其他语言中可能被称作 `dictionary`:idx: (字典或映射)) 操作的高效实现.
 ##
-## There are several different types of hash tables available:
-## * `Table<#Table>`_ is the usual hash table,
-## * `OrderedTable<#OrderedTable>`_ is like ``Table`` but remembers insertion order,
-## * `CountTable<#CountTable>`_ is a mapping from a key to its number of occurrences
+## 哈希表有这么几种相关的类型:
+## * `Table<#Table>`_ 是最常用的表结构,
+## * `OrderedTable<#OrderedTable>`_ 和 ``Table`` 类似，但其中的元素是排序了的,
+## * `CountTable<#CountTable>`_ 记录了键以及这些键被重复的次数
 ##
-## For consistency with every other data type in Nim these have **value**
-## semantics, this means that ``=`` performs a copy of the hash table.
+## 为了与其他类型保持一致性，哈希表也具有 ** 值类型 ** 语义
+## 这意味着 ``=`` 操作将会产生一个哈希表的拷贝.
 ##
-## For `ref semantics<manual.html#types-reference-and-pointer-types>`_
-## use their ``Ref`` variants: `TableRef<#TableRef>`_,
-## `OrderedTableRef<#OrderedTableRef>`_, and `CountTableRef<#CountTableRef>`_.
+## 如果想使用 ` 引用语义 <manual.html#types-reference-and-pointer-types>`_
+## 可以使用 ``Ref`` 标识的类型: `TableRef<#TableRef>`_,
+## `OrderedTableRef<#OrderedTableRef>`_, 以及 `CountTableRef<#CountTableRef>`_.
 ##
-## To give an example, when ``a`` is a ``Table``, then ``var b = a`` gives ``b``
-## as a new independent table. ``b`` is initialised with the contents of ``a``.
-## Changing ``b`` does not affect ``a`` and vice versa:
-##
-## .. code-block::
-##   import tables
-##
-##   var
-##     a = {1: "one", 2: "two"}.toTable  # creates a Table
-##     b = a
-##
-##   echo a, b  # output: {1: one, 2: two}{1: one, 2: two}
-##
-##   b[3] = "three"
-##   echo a, b  # output: {1: one, 2: two}{1: one, 2: two, 3: three}
-##   echo a == b  # output: false
-##
-## On the other hand, when ``a`` is a ``TableRef`` instead, then changes to ``b``
-## also affect ``a``. Both ``a`` and ``b`` **ref** the same data structure:
+## 请看下面的例子。 如果 ``a`` 是表类型 ``Table``, 那么 ``var b = a`` 将会使 ``b`` 成为一个完全与 ``a`` 没有任何关联性的变量
+##  ``b`` 将会使用 ``a`` 的内容来初始化自身.
+## 修改 ``b`` 或者 ``a`` 将不会对另一个造成任何影响:
 ##
 ## .. code-block::
 ##   import tables
 ##
 ##   var
-##     a = {1: "one", 2: "two"}.newTable  # creates a TableRef
+##     a = {1: "one", 2: "two"}.toTable  # 创建一个哈希表
 ##     b = a
 ##
 ##   echo a, b  # output: {1: one, 2: two}{1: one, 2: two}
 ##
 ##   b[3] = "three"
-##   echo a, b  # output: {1: one, 2: two, 3: three}{1: one, 2: two, 3: three}
-##   echo a == b  # output: true
+##   echo a, b  # 输出 : {1: one, 2: two}{1: one, 2: two, 3: three}
+##   echo a == b  # 输出 : false
+##
+## 如果 ``a`` 是一个 ``TableRef`` 类型的表(即引用类型), 那么对 ``b`` 的修改将影响到 ``a`` ，反之亦然。
+## 因为 ``a`` 和 ``b`` 都是 **ref** 类型，指向内存中同一块数据:
+##
+## .. code-block::
+##   import tables
+##
+##   var
+##     a = {1: "one", 2: "two"}.newTable  # 创建 TableRef 类型变量，注意过程的new前缀
+##     b = a
+##
+##   echo a, b  # 输出 : {1: one, 2: two}{1: one, 2: two}
+##
+##   b[3] = "three"
+##   echo a, b  # 输出 : {1: one, 2: two, 3: three}{1: one, 2: two, 3: three}
+##   echo a == b  # 输出 : true
 ##
 ## ----
 ##
-## Basic usage
+## 基本用法
 ## ===========
 ##
 ## Table
