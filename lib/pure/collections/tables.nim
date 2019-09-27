@@ -12,7 +12,7 @@
 ##
 ## 哈希表有这么几种相关的类型:
 ## * `Table<#Table>`_ 是最常用的表结构,
-## * `OrderedTable<#OrderedTable>`_ 和 ``Table`` 类似，但其中的元素是排序了的,
+## * `OrderedTable<#OrderedTable>`_ 和 ``Table`` 类似，但其中的键值对是有序的,
 ## * `CountTable<#CountTable>`_ 记录了键以及这些键被重复的次数
 ##
 ## 为了与其他类型保持一致性，哈希表也具有 ** 值类型 ** 语义
@@ -86,8 +86,7 @@
 ##   for pairs in zip(years, names):
 ##     let (birthYear, name) = pairs
 ##     if not beatlesByYear.hasKey(birthYear):
-##       # if a key doesn't exist, we create one with an empty sequence
-##       # before we can add elements to it
+##       # 如果键不存在，那么就创建一个，并把值指定为一个空的seq。这样我们以后可以往里面放值。
 ##       beatlesByYear[birthYear] = @[]
 ##     beatlesByYear[birthYear].add(name)
 ##
@@ -99,16 +98,15 @@
 ## OrderedTable
 ## ------------
 ##
-## `OrderedTable<#OrderedTable>`_ is used when it is important to preserve
-## the insertion order of keys.
+## `OrderedTable<#OrderedTable>`_ 当你想保留键的插入先后次序，请使用这个表类型
 ##
 ## .. code-block::
 ##   import tables
 ##
 ##   let
 ##     a = [('z', 1), ('y', 2), ('x', 3)]
-##     t = a.toTable          # regular table
-##     ot = a.toOrderedTable  # ordered tables
+##     t = a.toTable          # 普通的表类型
+##     ot = a.toOrderedTable  # 有序的表类型
 ##
 ##   echo t   # {'x': 3, 'y': 2, 'z': 1}
 ##   echo ot  # {'z': 1, 'y': 2, 'x': 3}
@@ -118,12 +116,10 @@
 ## CountTable
 ## ----------
 ##
-## `CountTable<#CountTable>`_ is useful for counting number of items of some
-## container (e.g. string, sequence or array), as it is a mapping where the
-## items are the keys, and their number of occurrences are the values.
-## For that purpose `toCountTable proc<#toCountTable,openArray[A]>`_
-## comes handy:
-##
+## `CountTable<#CountTable>`_ 常用来统计一些容器中元素出现的次数(比如 string、seq、数组)
+## 他会将被统计的容器中的元素作为键，出现的次数作为值。
+## 使用 `toCountTable proc<#toCountTable,openArray[A]>`_ 可以完成此操作
+## 
 ## .. code-block::
 ##   import tables
 ##
@@ -132,8 +128,7 @@
 ##   echo letterFrequencies
 ##   # 'a': 5, 'b': 2, 'c': 1, 'd': 1, 'r': 2}
 ##
-## The same could have been achieved by manually iterating over a container
-## and increasing each key's value with `inc proc<#inc,CountTable[A],A,int>`_:
+## 当然，你也可以手动地迭代整个容器，使用 `inc proc<#inc,CountTable[A],A,int>`_ 增加相应元素对应的值来达到相同目的
 ##
 ## .. code-block::
 ##   import tables
@@ -149,7 +144,7 @@
 ##
 ##
 ##
-## Hashing
+## 可哈希类型
 ## -------
 ##
 ## If you are using simple standard types like ``int`` or ``string`` for the
