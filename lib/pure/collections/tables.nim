@@ -146,11 +146,8 @@
 ##
 ## 可哈希类型
 ## -------
-##
-## If you are using simple standard types like ``int`` or ``string`` for the
-## keys of the table you won't have any problems, but as soon as you try to use
-## a more complex object as a key you will be greeted by a strange compiler
-## error:
+## 如果你使用简单内置类型比如 ``int`` 或 ``string`` 来做哈希表的键不会出问题，
+## 但是如果你是用复合类型object来做键，那么会得到如下的编译错误(hashes.hash()传入了object类型，不匹配)
 ##
 ##   Error: type mismatch: got (Person)
 ##   but expected one of:
@@ -159,17 +156,15 @@
 ##   hashes.hash(x: float): Hash
 ##   …
 ##
-## What is happening here is that the types used for table keys require to have
-## a ``hash()`` proc which will convert them to a `Hash <hashes.html#Hash>`_
-## value, and the compiler is listing all the hash functions it knows.
-## Additionally there has to be a ``==`` operator that provides the same
-## semantics as its corresponding ``hash`` proc.
+## 产生错误的原因在于，一个类型要能做哈希表的键，那么必须有一个名为hash的过程能将这个类型的值转化成 `Hash <hashes.html#Hash>`_ 类型的值
+## 编译器在编译时会查找这种hash过程，找不到就会报如上的错误。
+## 同时你必须为类型重载 ``==`` 操作符，这样自定义类型具有判断相等的语义，并作为hash过程的判等依据。
+## (译注：可哈希类型就是指类型可以按照特定规则产生哈希值，并作为判等依据)
 ##
-## After you add ``hash`` and ``==`` for your custom type everything will work.
-## Currently, however, ``hash`` for objects is not defined, whereas
-## ``system.==`` for objects does exist and performs a "deep" comparison (every
-## field is compared) which is usually what you want. So in the following
-## example implementing only ``hash`` suffices:
+## 在添加 ``hash`` 和 ``==`` 的定义后，一切将会顺利编译通过。
+## 现在我们还没有为自定义类型定义 ``hash`` 过程, 
+## 不过 ``system.==`` 默认情况下，会深入地比较object的每个成员来作为判等依据，这通常满足我们的期望。
+## 所以下面的例子里我们只定义 ``hash`` 过程即可
 ##
 ## .. code-block::
 ##   import tables, hashes
@@ -179,9 +174,7 @@
 ##       firstName, lastName: string
 ##
 ##   proc hash(x: Person): Hash =
-##     ## Piggyback on the already available string hash proc.
-##     ##
-##     ## Without this proc nothing works!
+##     ## 这里直接利用 string 类型的 hash 过程.
 ##     result = x.firstName.hash !& x.lastName.hash
 ##     result = !$result
 ##
@@ -199,14 +192,12 @@
 ##
 ## ----
 ##
-## See also
+## 另见
 ## ========
 ##
-## * `json module<json.html>`_ for table-like structure which allows
-##   heterogeneous members
+## * `json module<json.html>`_ 类似于哈希表的结构，但是允许使用不同的数据类型
 ## * `sharedtables module<sharedtables.html>`_ for shared hash table support
-## * `strtabs module<strtabs.html>`_ for efficient hash tables
-##   mapping from strings to strings
+## * `strtabs module<strtabs.html>`_ 产生高效的哈希表 string - string 映射结构
 ## * `hashes module<hashes.html>`_ for helper functions for hashing
 
 
