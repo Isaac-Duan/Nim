@@ -196,8 +196,8 @@
 ## ========
 ##
 ## * `json module<json.html>`_ 类似于哈希表的结构，但是允许使用不同的数据类型
-## * `sharedtables module<sharedtables.html>`_ for shared hash table support
-## * `strtabs module<strtabs.html>`_ 产生高效的哈希表 string - string 映射结构
+## * `sharedtables module<sharedtables.html>`_ 共享哈希表
+## * `strtabs module<strtabs.html>`_ 高效的哈希表，仅限 string - string 的映射结构
 ## * `hashes module<hashes.html>`_ for helper functions for hashing
 
 
@@ -209,26 +209,23 @@ type
   KeyValuePair[A, B] = tuple[hcode: Hash, key: A, val: B]
   KeyValuePairSeq[A, B] = seq[KeyValuePair[A, B]]
   Table*[A, B] = object
-    ## Generic hash table, consisting of a key-value pair.
+    ## 键值对形式的通用哈希表结构
     ##
-    ## `data` and `counter` are internal implementation details which
-    ## can't be accessed.
+    ## `data` 和 `counter` 为不可见的内部实现
     ##
-    ## For creating an empty Table, use `initTable proc<#initTable,int>`_.
+    ## 使用 `initTable proc<#initTable,int>`_ 创建一个空的哈希表
     data: KeyValuePairSeq[A, B]
     counter: int
-  TableRef*[A, B] = ref Table[A, B] ## Ref version of `Table<#Table>`_.
+  TableRef*[A, B] = ref Table[A, B] ## Ref 版本的 `Table<#Table>`_.
     ##
-    ## For creating a new empty TableRef, use `newTable proc
-    ## <#newTable,int>`_.
+    ##  使用 `newTable 过程来创建 TableRef <#newTable,int>`_.
 
 const
   defaultInitialSize* = 64
 
 # ------------------------------ helpers ---------------------------------
 
-# Do NOT move these to tableimpl.nim, because sharedtables uses that
-# file and has its own implementation.
+# 以下代码不能移入 tableimpl.nim, 因为 sharedtables 也引用了这些代码文件，并且做了另外的实现
 template maxHash(t): untyped = high(t.data)
 template dataLen(t): untyped = len(t.data)
 
@@ -237,8 +234,8 @@ include tableimpl
 proc rightSize*(count: Natural): int {.inline.}
 
 template get(t, key): untyped =
-  ## retrieves the value at ``t[key]``. The value can be modified.
-  ## If ``key`` is not in ``t``, the ``KeyError`` exception is raised.
+  ## 读取或修改 ``t[key]`` 中的值
+  ## 如果 ``key`` 不在 ``t`` 中， ``KeyError`` 异常将被抛出
   mixin rawGet
   var hc: Hash
   var index = rawGet(t, key, hc)
@@ -268,17 +265,16 @@ proc enlarge[A, B](t: var Table[A, B]) =
 
 
 # -------------------------------------------------------------------
-# ------------------------------ Table ------------------------------
+# ------------------------------ Table 类型 ------------------------------
 # -------------------------------------------------------------------
 
 proc initTable*[A, B](initialSize = defaultInitialSize): Table[A, B] =
-  ## Creates a new hash table that is empty.
+  ## 创建一个空的 Table
   ##
-  ## ``initialSize`` must be a power of two (default: 64).
-  ## If you need to accept runtime values for this you could use the
-  ## `nextPowerOfTwo proc<math.html#nextPowerOfTwo,int>`_ from the
-  ## `math module<math.html>`_ or the `rightSize proc<#rightSize,Natural>`_
-  ## from this module.
+  ## ``initialSize`` 必须是2的n次幂 (默认值是64).
+  ## 如果要在运行时动态获取此值，你需要使用过程
+  ## `nextPowerOfTwo proc<math.html#nextPowerOfTwo,int>`_ (定义在
+  ## `math 模块 <math.html>`_ 中) 或者本模块中的过程 `rightSize proc<#rightSize,Natural>`_
   ##
   ## Starting from Nim v0.20, tables are initialized by default and it is
   ## not necessary to call this function explicitly.
