@@ -276,27 +276,26 @@ proc initTable*[A, B](initialSize = defaultInitialSize): Table[A, B] =
   ## `nextPowerOfTwo proc<math.html#nextPowerOfTwo,int>`_ (定义在
   ## `math 模块 <math.html>`_ 中) 或者本模块中的过程 `rightSize proc<#rightSize,Natural>`_
   ##
-  ## Starting from Nim v0.20, tables are initialized by default and it is
-  ## not necessary to call this function explicitly.
+  ## 从 Nim v0.20 开始, table 是默认就会被初始化的，所以无需使用此过程显示地初始化table
   ##
-  ## See also:
+  ## 另见:
   ## * `toTable proc<#toTable,openArray[]>`_
-  ## * `newTable proc<#newTable,int>`_ for creating a `TableRef`
-  runnableExamples:
+  ## * `newTable proc<#newTable,int>`_ 用以创建 `TableRef`
+  举个例子:
     let
       a = initTable[int, string]()
       b = initTable[char, seq[int]]()
   initImpl(result, initialSize)
 
 proc `[]=`*[A, B](t: var Table[A, B], key: A, val: B) =
-  ## Inserts a ``(key, value)`` pair into ``t``.
+  ## 把 ``(key, value)`` 键值对插入到 ``t`` 中.
   ##
-  ## See also:
-  ## * `[] proc<#[],Table[A,B],A>`_ for retrieving a value of a key
+  ## 另见:
+  ## * `[] proc<#[],Table[A,B],A>`_ 通过键索引出对应的值
   ## * `hasKeyOrPut proc<#hasKeyOrPut,Table[A,B],A,B>`_
   ## * `mgetOrPut proc<#mgetOrPut,Table[A,B],A,B>`_
-  ## * `del proc<#del,Table[A,B],A>`_ for removing a key from the table
-  runnableExamples:
+  ## * `del proc<#del,Table[A,B],A>`_ 通过键来删除对应的键值对
+  举个例子:
     var a = initTable[char, int]()
     a['x'] = 7
     a['y'] = 33
@@ -305,14 +304,14 @@ proc `[]=`*[A, B](t: var Table[A, B], key: A, val: B) =
   putImpl(enlarge)
 
 proc toTable*[A, B](pairs: openArray[(A, B)]): Table[A, B] =
-  ## Creates a new hash table that contains the given ``pairs``.
+  ## 使用给定的键值对 ``pairs`` 创建一个table
   ##
-  ## ``pairs`` is a container consisting of ``(key, value)`` tuples.
+  ## ``pairs`` 是由 ``(key, value)`` 形式的tuple组成的数组.
   ##
-  ## See also:
+  ## 另见:
   ## * `initTable proc<#initTable,int>`_
-  ## * `newTable proc<#newTable,openArray[]>`_ for a `TableRef` version
-  runnableExamples:
+  ## * `newTable proc<#newTable,openArray[]>`_ 创建 `TableRef`
+  另见:
     let a = [('a', 5), ('b', 9)]
     let b = toTable(a)
     assert b == {'a': 5, 'b': 9}.toTable
@@ -321,7 +320,7 @@ proc toTable*[A, B](pairs: openArray[(A, B)]): Table[A, B] =
   for key, val in items(pairs): result[key] = val
 
 proc `[]`*[A, B](t: Table[A, B], key: A): B =
-  ## Retrieves the value at ``t[key]``.
+  ## 通过键key取出对应的值 ``t[key]``.
   ##
   ## If ``key`` is not in ``t``, the ``KeyError`` exception is raised.
   ## One can check with `hasKey proc<#hasKey,Table[A,B],A>`_ whether
