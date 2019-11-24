@@ -322,20 +322,19 @@ proc toTable*[A, B](pairs: openArray[(A, B)]): Table[A, B] =
 proc `[]`*[A, B](t: Table[A, B], key: A): B =
   ## 通过键key取出对应的值 ``t[key]``.
   ##
+  ## 如果 ``key`` 不在 ``t`` 中, 那么程序会抛出 ``KeyError`` 异常.
+  ## 你可以使用 `hasKey proc<#hasKey,Table[A,B],A>`_ 来检查键是否存在.
   ## If ``key`` is not in ``t``, the ``KeyError`` exception is raised.
   ## One can check with `hasKey proc<#hasKey,Table[A,B],A>`_ whether
   ## the key exists.
   ##
-  ## See also:
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ to return
-  ##   a default value (e.g. zero for int) if the key doesn't exist
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to return
-  ##   a custom value if the key doesn't exist
-  ## * `[]= proc<#[]=,Table[A,B],A,B>`_ for inserting a new
-  ##   (key, value) pair in the table
-  ## * `hasKey proc<#hasKey,Table[A,B],A>`_ for checking if a key is in
-  ##   the table
-  runnableExamples:
+  ## 另见:
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ 如果键不存在，那么这个过程可以返回一个默认值.
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ 如果键不存在，那么返回你设定的默认值.
+  ## * `[]= proc<#[]=,Table[A,B],A,B>`_ 插入一个新的键值对.
+  ## * `hasKey proc<#hasKey,Table[A,B],A>`_ 用来检查表中是否存在键.
+  ## 
+  示例代码:
     let a = {'a': 5, 'b': 9}.toTable
     doAssert a['a'] == 5
     doAssertRaises(KeyError):
@@ -343,32 +342,24 @@ proc `[]`*[A, B](t: Table[A, B], key: A): B =
   get(t, key)
 
 proc `[]`*[A, B](t: var Table[A, B], key: A): var B =
-  ## Retrieves the value at ``t[key]``. The value can be modified.
-  ##
-  ## If ``key`` is not in ``t``, the ``KeyError`` exception is raised.
-  ##
-  ## See also:
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ to return
-  ##   a default value (e.g. zero for int) if the key doesn't exist
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to return
-  ##   a custom value if the key doesn't exist
-  ## * `[]= proc<#[]=,Table[A,B],A,B>`_ for inserting a new
-  ##   (key, value) pair in the table
-  ## * `hasKey proc<#hasKey,Table[A,B],A>`_ for checking if a key is in
-  ##   the table
+  ## 取出 ``t[key]`` 的值. 并且可以对此位置的值进行修改. 
+  ## 如果 ``key`` 不在表中, 则程序会抛出 ``KeyError`` 异常. 
+  ## 另见:
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ 如果键不存在则返回一个默认值(比如int类型的默认值是0). 
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to 如果键不存在则返回一个自定义的默认值.
+  ## * `[]= proc<#[]=,Table[A,B],A,B>`_ 插入一个新的键值对.
+  ## * `hasKey proc<#hasKey,Table[A,B],A>`_ 检查表中是否存在该键.
   get(t, key)
 
 proc hasKey*[A, B](t: Table[A, B], key: A): bool =
-  ## Returns true if ``key`` is in the table ``t``.
+  ## 如果 ``key`` 存在于表 ``t`` 中, 则返回true.
   ##
-  ## See also:
-  ## * `contains proc<#contains,Table[A,B],A>`_ for use with the `in` operator
-  ## * `[] proc<#[],Table[A,B],A>`_ for retrieving a value of a key
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ to return
-  ##   a default value (e.g. zero for int) if the key doesn't exist
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to return
-  ##   a custom value if the key doesn't exist
-  runnableExamples:
+  ## 另见:
+  ## * `contains proc<#contains,Table[A,B],A>`_ 实现运算符 `in` 的功能.
+  ## * `[] proc<#[],Table[A,B],A>`_ 取出键所对应的值.
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ 如果间不存在则返回默认值(比如int类型的默认值是0).
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ 如果键不存在返回一个自定义的默认值.
+  示例代码:
     let a = {'a': 5, 'b': 9}.toTable
     doAssert a.hasKey('a') == true
     doAssert a.hasKey('z') == false
@@ -377,9 +368,8 @@ proc hasKey*[A, B](t: Table[A, B], key: A): bool =
   result = rawGet(t, key, hc) >= 0
 
 proc contains*[A, B](t: Table[A, B], key: A): bool =
-  ## Alias of `hasKey proc<#hasKey,Table[A,B],A>`_ for use with
-  ## the ``in`` operator.
-  runnableExamples:
+  ## 与 `hasKey proc<#hasKey,Table[A,B],A>`_ 实现相同, 用于实现操作符 in .
+  示例代码:
     let a = {'a': 5, 'b': 9}.toTable
     doAssert 'b' in a == true
     doAssert a.contains('z') == false
@@ -387,16 +377,14 @@ proc contains*[A, B](t: Table[A, B], key: A): bool =
   return hasKey[A, B](t, key)
 
 proc hasKeyOrPut*[A, B](t: var Table[A, B], key: A, val: B): bool =
-  ## Returns true if ``key`` is in the table, otherwise inserts ``value``.
+  ## 如果 ``key`` 存在于表中则返回true, 否则插入此键并将其值设置为 ``value``.
   ##
-  ## See also:
+  ## 另见:
   ## * `hasKey proc<#hasKey,Table[A,B],A>`_
-  ## * `[] proc<#[],Table[A,B],A>`_ for retrieving a value of a key
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ to return
-  ##   a default value (e.g. zero for int) if the key doesn't exist
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to return
-  ##   a custom value if the key doesn't exist
-  runnableExamples:
+  ## * `[] proc<#[],Table[A,B],A>`_ 取出键对应的值
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ 如果键不存在则返回一个默认值(比如int 类型的默认值是0).
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ 返回一个自定义的默认值
+  另见:
     var a = {'a': 5, 'b': 9}.toTable
     if a.hasKeyOrPut('a', 50):
       a['a'] = 99
@@ -407,18 +395,14 @@ proc hasKeyOrPut*[A, B](t: var Table[A, B], key: A, val: B): bool =
   hasKeyOrPutImpl(enlarge)
 
 proc getOrDefault*[A, B](t: Table[A, B], key: A): B =
-  ## Retrieves the value at ``t[key]`` if ``key`` is in ``t``. Otherwise, the
-  ## default initialization value for type ``B`` is returned (e.g. 0 for any
-  ## integer type).
-  ##
-  ## See also:
-  ## * `[] proc<#[],Table[A,B],A>`_ for retrieving a value of a key
+  ## 取出键对应的值, 如果键不存在于表中, 则返回类型 ``B`` 的默认初始化值(比如对于任何整数类型的返回一个0).
+  ## 另见:
+  ## * `[] proc<#[],Table[A,B],A>`_ 取出键对应的值
   ## * `hasKey proc<#hasKey,Table[A,B],A>`_
   ## * `hasKeyOrPut proc<#hasKeyOrPut,Table[A,B],A,B>`_
   ## * `mgetOrPut proc<#mgetOrPut,Table[A,B],A,B>`_
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ to return
-  ##   a custom value if the key doesn't exist
-  runnableExamples:
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A,B>`_ 如果键不存在则返回一个自定义的值
+  示例代码:
     let a = {'a': 5, 'b': 9}.toTable
     doAssert a.getOrDefault('a') == 5
     doAssert a.getOrDefault('z') == 0
@@ -426,17 +410,14 @@ proc getOrDefault*[A, B](t: Table[A, B], key: A): B =
   getOrDefaultImpl(t, key)
 
 proc getOrDefault*[A, B](t: Table[A, B], key: A, default: B): B =
-  ## Retrieves the value at ``t[key]`` if ``key`` is in ``t``.
-  ## Otherwise, ``default`` is returned.
-  ##
-  ## See also:
-  ## * `[] proc<#[],Table[A,B],A>`_ for retrieving a value of a key
+  ## 取出键key对应的值, 如果键不存在, 则返回 ``default`` .
+  ## 另见:
+  ## * `[] proc<#[],Table[A,B],A>`_ 取出键对应的值
   ## * `hasKey proc<#hasKey,Table[A,B],A>`_
   ## * `hasKeyOrPut proc<#hasKeyOrPut,Table[A,B],A,B>`_
   ## * `mgetOrPut proc<#mgetOrPut,Table[A,B],A,B>`_
-  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ to return
-  ##   a default value (e.g. zero for int) if the key doesn't exist
-  runnableExamples:
+  ## * `getOrDefault proc<#getOrDefault,Table[A,B],A>`_ 如果键不存在则返回一个默认值(比如int 类型的默认值是0)
+  示例代码:
     let a = {'a': 5, 'b': 9}.toTable
     doAssert a.getOrDefault('a', 99) == 5
     doAssert a.getOrDefault('z', 99) == 99
